@@ -30,7 +30,7 @@ mbedtls_from_type(AEADAlgorithm algorithm)
 {
   switch (algorithm) {
     case AEADAlgorithm::AES_CM_128:
-      return MBEDTLS_CIPHER_AES_128_CCM;
+      return MBEDTLS_CIPHER_AES_128_CTR;
     case AEADAlgorithm::AES_GCM_128:
       return MBEDTLS_CIPHER_AES_128_GCM;
     case AEADAlgorithm::AES_GCM_256:
