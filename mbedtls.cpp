@@ -1,9 +1,9 @@
 #include "mbedtls.h"
+#include <iostream>
 #include <mbedtls/cipher.h>
 #include <mbedtls/constant_time.h>
-#include <mbedtls/md.h>
 #include <mbedtls/error.h>
-#include <iostream>
+#include <mbedtls/md.h>
 
 namespace sframe {
 namespace provider {
@@ -179,56 +179,19 @@ MbedTLSProvider::ctr_crypt(AEADAlgorithm algorithm,
     ctx.get(), key.data(), key.size() * 8, MBEDTLS_ENCRYPT);
   if (keyed != 0) {
     throw std::runtime_error("Failed to set key");
-  } 
-  // const auto padded = mbedtls_cipher_set_padding_mode(
-  //   ctx.get(), mbedtls_cipher_padding_t::MBEDTLS_PADDING_ZEROS);
-  // if (padded != 0) {
-  //   switch (padded) {
-  //     case MBEDTLS_ERR_CIPHER_FEATURE_UNAVAILABLE:
-  //       throw std::runtime_error("Padding mode not available");
-  //     case MBEDTLS_ERR_CIPHER_BAD_INPUT_DATA:
-  //       throw std::runtime_error("cipher mode does not support padding");
-  //     default:
-  //       throw std::runtime_error("Failed to set padding mode");
-  //   }
-  // }
-  // const auto nonce_set =
-  //   mbedtls_cipher_set_iv(ctx.get(), padded_nonce.data(), padded_nonce.size());
-  // if (nonce_set != 0) {
-  //   throw std::runtime_error("Failed to set nonce");
-  // }
-  
-  std::size_t outlen = 0;
-  const int crypt = mbedtls_cipher_crypt(ctx.get(), padded_nonce.data(), padded_nonce.size(), in.data(), in.size(), out.data(), &outlen);
-  switch (crypt) {
-    case 0:
-      break;
-    case MBEDTLS_ERR_CIPHER_BAD_INPUT_DATA:
-      throw std::runtime_error("Parameter verification failure");
-    case MBEDTLS_ERR_CIPHER_FULL_BLOCK_EXPECTED:
-      throw std::runtime_error("Full block expected");
-    case MBEDTLS_ERR_CIPHER_INVALID_PADDING:
-      throw std::runtime_error("Invalid padding");
-    default:
-      std::cout << std::hex << crypt << std::endl;
-      char error[1024];
-      mbedtls_strerror(crypt, error, 1024);
-      throw std::runtime_error(error);
   }
 
-  
-  // const int update =
-  //   mbedtls_cipher_update(ctx.get(), in.data(), in.size(), out.data(), &outlen);
-  // switch (update) {
-  //   case 0:
-  //     break;
-  //   case MBEDTLS_ERR_CIPHER_BAD_INPUT_DATA:
-  //     throw std::runtime_error("Parameter verification failure");
-  //   case MBEDTLS_ERR_CIPHER_FEATURE_UNAVAILABLE:
-  //     throw std::runtime_error("Unsupported cipher mode");
-  //   default:
-  //     throw std::runtime_error("Cipher specific failure");
-  // }
+  std::size_t outlen = 0;
+  const int crypt = mbedtls_cipher_crypt(ctx.get(),
+                                         padded_nonce.data(),
+                                         padded_nonce.size(),
+                                         in.data(),
+                                         in.size(),
+                                         out.data(),
+                                         &outlen);
+  if (crypt != 0) {
+    throw std::runtime_error("Failed to encrypt");
+  }
 
   const int finish = mbedtls_cipher_finish(ctx.get(), out.data(), &outlen);
   if (finish != 0) {
