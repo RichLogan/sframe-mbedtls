@@ -1,7 +1,0 @@
-{
-    "name": "sframe-mbedtls",
-    "version-string": "0.1",
-    "description": "MbedTLS provider for SFrame",
-    "dependencies": ["gsl-lite"]
-  }
-  

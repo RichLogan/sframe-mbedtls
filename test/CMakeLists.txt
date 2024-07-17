@@ -1,0 +1,6 @@
+find_package(doctest REQUIRED)
+find_package(sframe REQUIRED)
+include(doctest)
+add_executable(${PROJECT_NAME}_test mbedtls.cpp)
+target_link_libraries(${PROJECT_NAME}_test PUBLIC sframe_mbedtls doctest::doctest sframe::sframe)
+doctest_discover_tests(${PROJECT_NAME}_test)
