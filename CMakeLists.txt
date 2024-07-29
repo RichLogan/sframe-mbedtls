@@ -2,7 +2,11 @@ cmake_minimum_required(VERSION 3.5)
 project(sframe_mbedtls)
 
 find_package(sframe REQUIRED)
-find_package(mbedTLS REQUIRED)
+if (TARGET MbedTLS::mbedtls)
+    message(STATUS "Using provided in-project mbedtls target")
+else()
+    find_package(mbedTLS REQUIRED)
+endif()
 
 add_library(${PROJECT_NAME} mbedtls.h mbedtls.cpp)
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 11)
